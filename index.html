@@ -186,6 +186,8 @@
   .htog .knob{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.15s;}
   .htog.on .knob{right:23px;}
   .hphase-pick{margin-top:8px;}
+  .hphase-dates{color:var(--accent2);font-size:13px;font-weight:700;background:rgba(246,207,154,.08);border-radius:10px;padding:8px 10px;margin:8px 0;}
+  .hphase-days{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 4px;}
   .hormone-sub{color:var(--sub);font-size:13px;line-height:1.6;margin:0 0 16px;}
   .moon-sub{color:var(--accent2);font-size:13px;font-weight:600;margin:0 0 8px;}
   .confirmRow{display:flex;gap:10px;margin-top:16px;}
@@ -294,37 +296,12 @@
       <div class="phaseSel" id="phaseSel"></div>
     </div>
 
-    <div id="alertsBox" class="alerts hidden">
-      <h3>&#128276; התראות וסת וביוץ</h3>
-      <div class="pred">
-        <div class="prow rose"><span class="nm">&#127801; וסת צפויה</span><span class="vl rose" id="predPeriod"></span></div>
-        <div class="prow gold"><span class="nm">&#10024; חלון פוריות</span><span class="vl gold" id="predFert"></span></div>
-        <div class="prow gold"><span class="nm">&#127775; יום הביוץ</span><span class="vl gold" id="predOvul"></span></div>
-      </div>
-      <div class="qsub">כמה ימים לפני הוסת להתריע?</div>
-      <div class="days" id="daysBtns"></div>
-      <div class="timerow"><span>&#128340; שעת ההתראה</span><input type="time" id="alertHour" value="09:00"></div>
-      <div class="toggles">
-        <div class="tog" id="togPeriod" onclick="toggle('togPeriod')">
-          <div class="tt"><div class="a">&#127801; התראה לפני הוסת</div><div class="b" id="togPeriodSub">2 ימים מראש, בשעה 09:00</div></div>
-          <div class="sw"></div>
-        </div>
-        <div class="tog" id="togFert" onclick="toggle('togFert')">
-          <div class="tt"><div class="a">&#10024; התראה על חלון פוריות</div><div class="b">לתכנון הריון או מניעה טבעית</div></div>
-          <div class="sw"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="marksBox" class="marks hidden">
-      <h3>&#127912; כיצד לסמן ביומן</h3>
-      <div id="markList"></div>
-    </div>
-
     <div id="hormoneBox" class="marks hidden">
       <h3>&#129516; שלבי המחזור וההורמונים</h3>
       <p class="hormone-disc">המידע כאן הוא לרווחה כללית והיכרות עם הגוף, ואינו ייעוץ רפואי. לגבי ויטמינים ותוספים — יש להיוועץ עם רופא/ה לפני נטילה, במיוחד בהריון ובהנקה. לבעיות מתמשכות או חששות — כדאי לפנות לרופא/ה.</p>
       <div id="hormoneList"></div>
+      <div class="timerow" style="margin-top:16px;"><span>&#128340; שעת ההתראות (לכל ההתראות)</span><input type="time" id="alertHour" value="09:00" onchange="onAlertHour()"></div>
+      <p class="hormone-sub" style="margin-top:8px;margin-bottom:0;">השעה הזו חלה על כל ההתראות שהפעלת. ניתן לשנות את השעה של כל התראה בנפרד מאוחר יותר ביומן Google עצמו.</p>
     </div>
 
     <div id="moonBox" class="marks hidden">
@@ -346,12 +323,12 @@
         <div class="gcal-anchor">
           <p>📅 <b>דף השאלון יופיע ביומן שלך בתאריך של היום (<span id="anchorToday"></span>).</b></p>
           <p><b>תוקף השירות:</b> עד <b><span id="anchorEnd"></span></b>.</p>
-          <p>בכל רגע שתרצי — תוכלי להיכנס לדף דרך האירוע ביומן, ולעדכן אם היו שינויים (למשל מעבר להריון, שינוי במחזור וכו׳).</p>
+          <p>⚠️ לעדכון בעתיד — היכנסי <b>דרך הקישור שבאירוע ביומן בלבד</b>. כך חוזרים בדיוק לאותו יומן (בלי ליצור יומן חדש). אם היו שינויים (מעבר להריון, שינוי במחזור וכו׳) — עדכני ולחצי שמור.</p>
         </div>
 
         <div class="gcal-steps gcal-steps-strong">
           <p class="gcal-steps-title">חשוב — איך מוצאים את היומן אחרי ההתחברות:</p>
-          <p class="gcal-step">1. ממתינים כ-2 דקות (בלי לרענן ובלי לגעת).</p>
+          <p class="gcal-step">1. ההתחברות לוקחת כ-3-4 דקות. <b>המתיני</b> עד שתופיע ההודעה ״היומן מחובר ומעודכן ✓״ — בלי לרענן ובלי לגעת.</p>
           <p class="gcal-step">2. פותחים את אפליקציית <b>Google Calendar</b>.</p>
           <p class="gcal-step">3. לוחצים על סמל הסנכרון 🔄 (״סנכרן עכשיו״).</p>
           <p class="gcal-step">4. גוללים מעט מעלה — היומן <b>SagegoCycle</b> עם האירועים יופיע.</p>
@@ -413,28 +390,35 @@
      tipShort:'אנרגיה עולה — זמן לפעילות פעילה',
      vit:'ויטמיני B (B6, חומצה פולית, B12) לתמיכה בוויסות הורמונלי, וויטמין E לזקיקים המתפתחים.',
      vitShort:'ויטמיני B וויטמין E',
-     syms:['\uD83C\uDF31','\uD83C\uDF3F','\uD83C\uDF43','\u2618\uFE0F'],defSym:'\uD83C\uDF31',defColor:'#7FB069'},
-    {k:'ovul',name:'שלב הביוץ',emoji:'\uD83D\uDCab',hormone:'אסטרוגן ו-LH בשיא',
-     desc:'האסטרוגן בשיא וזינוק ב-LH משחרר את הביצית. זהו שיא הפוריות וגם שיא האנרגיה והחשק.',
-     tip:'מתאים לפעילות חברתית ולמאמץ גופני גבוה. שתייה מרובה.',
-     tipShort:'שיא אנרגיה ופוריות',
-     vit:'נוגדי חמצון (הצורך עולה בזמן הביוץ), אבץ ואומגה-3 לתמיכה באיזון הורמונלי.',
-     vitShort:'נוגדי חמצון, אבץ ואומגה-3',
-     syms:['\u2B50','\uD83C\uDF1F','\u2728','\uD83D\uDCab'],defSym:'\u2B50',defColor:'#E8924A'},
+     mark:'color',alert:false,defColor:'#7FB069',defShow:false},
+    {k:'fertile',name:'חלון פוריות',emoji:'\u2728',hormone:'אסטרוגן עולה לקראת שיא',
+     desc:'תקופת הפוריות — כמה ימים סביב הביוץ שבהם הסיכוי להריון הוא הגבוה ביותר.',
+     tip:'מתאים לתכנון הריון או למניעה טבעית. שתייה מרובה.',
+     tipShort:'תקופת הפוריות',
+     vit:'נוגדי חמצון ואומגה-3 לתמיכה באיזון הורמונלי.',
+     vitShort:'נוגדי חמצון ואומגה-3',
+     mark:'color',alert:true,defColor:'#E6C84A',defShow:true},
+    {k:'ovul',name:'יום הביוץ (משוער)',emoji:'\u2B50',hormone:'LH בשיא',
+     desc:'היום המשוער של שחרור הביצית. מאחר שזו הערכה — מסומן למשך כ-48 שעות (יומיים).',
+     tip:'שיא הפוריות והאנרגיה. מתאים לפעילות חברתית ולמאמץ גבוה.',
+     tipShort:'שיא הפוריות',
+     vit:'נוגדי חמצון, אבץ ואומגה-3.',
+     vitShort:'נוגדי חמצון ואבץ',
+     mark:'symbol',alert:true,syms:['\u2B50','\uD83C\uDF1F','\u2728','\uD83D\uDCab'],defSym:'\u2B50',defShow:true},
     {k:'luteal',name:'שלב לוטאלי (אחרי ביוץ)',emoji:'\uD83C\uDF19',hormone:'פרוגסטרון עולה',
      desc:'הפרוגסטרון עולה ומכין את רירית הרחם. בחצי השני עלולים להופיע תסמיני קדם-וסת (רגזנות, עייפות, נפיחות, חשק למתוק).',
      tip:'להפחית מלח וקפאין (מקלים על נפיחות ורגזנות), להעדיף אומגה-3, סידן וויטמין D. לתת מקום למנוחה ולשינה טובה.',
      tipShort:'יתכנו תסמיני קדם-וסת — להפחית מלח וקפאין',
      vit:'ויטמין B6 ומגנזיום לתמיכה במצב הרוח, וסידן וויטמין D (רמות נמוכות שלהם קשורות לתסמיני קדם-וסת).',
      vitShort:'B6, מגנזיום, סידן וויטמין D',
-     syms:['\uD83C\uDF42','\uD83C\uDF41','\uD83E\uDD40','\uD83C\uDF19'],defSym:'\uD83C\uDF42',defColor:'#9B7EDE'},
-    {k:'period',name:'שלב הווסת',emoji:'\uD83C\uDF39',hormone:'אסטרוגן ופרוגסטרון נמוכים',
+     mark:'color',alert:false,defColor:'#9B7EDE',defShow:false},
+    {k:'period',name:'וסת',emoji:'\uD83C\uDF39',hormone:'אסטרוגן ופרוגסטרון נמוכים',
      desc:'האסטרוגן והפרוגסטרון בשפל ורירית הרחם נושרת. שלב של איפוס — רבות מרגישות עייפות וצורך במנוחה.',
      tip:'מנוחה ופעילות עדינה (יוגה, הליכה). מאכלים עשירים בברזל, חלבון, ושתייה מרובה.',
      tipShort:'מנוחה, ברזל ושתייה',
      vit:'ברזל (לחידוש מה שאבד בדימום) וויטמין D לתמיכה כללית.',
      vitShort:'ברזל וויטמין D',
-     syms:['\uD83C\uDF39','\uD83C\uDF3A','\uD83E\uDD40','\uD83D\uDCA7'],defSym:'\uD83C\uDF39',defColor:'#D64550'}
+     mark:'color',alert:true,defColor:'#D64550',defShow:true}
   ];
   var MOONS=[
     {k:'new',name:'מולד הירח (ירח חדש)',emoji:'\uD83C\uDF11',sub:'התחלות וכוונות',
@@ -452,7 +436,11 @@
   ];
   state.hphase={};
   state.hmarks={};
-  PHASES.forEach(function(p){ state.hphase[p.k]={show:false,tips:false,vits:false}; state.hmarks[p.k]={sym:p.defSym,color:p.defColor}; });
+  PHASES.forEach(function(p){
+    state.hphase[p.k]={show:p.defShow,tips:false,vits:false,alert:false,alertDays:2};
+    state.hmarks[p.k]={sym:(p.defSym||''),color:(p.defColor||'')};
+  });
+  state.alertHour="09:00";
   state.moon={};
   MOONS.forEach(function(mn){ state.moon[mn.k]={show:false,tips:false}; });
   state.trackView=null; state.symptoms={};
@@ -506,15 +494,11 @@
   function closeSymp(){ document.getElementById('sympModal').style.display='none'; }
   function saveSymp(){ closeSymp(); }
   function saveAll(){
-    var h=document.getElementById('alertHour'); if(h) state.hour=h.value||"09:00";
-    state.remindBefore=document.getElementById('togPeriod').classList.contains('on');
-    state.remindFertile=document.getElementById('togFert').classList.contains('on');
+    var h=document.getElementById('alertHour'); if(h) state.alertHour=h.value||"09:00";
     state.saved={
-      status:state.status, reason:state.reason, phase:state.phase,
+      menses:state.menses, status:state.status, reason:state.reason, phase:state.phase,
       lastPeriod:state.lastPeriod, cycleLength:state.cycleLength, periodLength:state.periodLength,
-      daysBefore:state.daysBefore, hour:state.hour,
-      remindBefore:state.remindBefore, remindFertile:state.remindFertile,
-      marks:state.marks
+      alertHour:state.alertHour, hphase:state.hphase, hmarks:state.hmarks, moon:state.moon
     };
     document.getElementById('saveOk').classList.remove('hidden');
     if(gcalToken && gcalCalendarId){ openConfirm(); }
@@ -548,32 +532,28 @@
         '<p class="hormone-disc" style="margin-bottom:0;">יש להיוועץ עם רופא/ה לפני נטילת ויטמינים או תוספים, במיוחד בהריון ובהנקה.</p></div>';
     } else { info.classList.add('hidden'); info.innerHTML=""; }
   }
-  function buildDays(){
-    var box=document.getElementById('daysBtns'); box.innerHTML="";
-    DAYS.forEach(function(d){
-      var b=document.createElement('button'); b.type="button"; b.className="day-btn"+(d===state.daysBefore?" sel":"");
-      b.textContent=d+" "+(d===1?"יום":"ימים");
-      b.onclick=function(){ state.daysBefore=d; buildDays(); updateTogSub(); };
-      box.appendChild(b);
-    });
+  function phaseDayRange(k,off,cl,pl){
+    if(k==='period') return [0,pl];
+    if(k==='follicular') return [pl, Math.max(pl+1,off-2)];
+    if(k==='fertile') return [off-2, off+2];
+    if(k==='ovul') return [off, off+2];
+    if(k==='luteal') return [off+2, cl];
+    return [0,1];
   }
-  function buildMarks(){
-    var list=document.getElementById('markList'); list.innerHTML="";
-    EVENTS.forEach(function(ev){
-      var m=state.marks[ev.k];
-      var row=document.createElement('div'); row.className="markRow";
-      var h='<div class="ev">'+ev.n+'</div><div class="lab">סמל:</div><div class="symbols">';
-      SYMBOLS.forEach(function(s){ h+='<button type="button" class="sym-btn'+(m.sym===s?' sel':'')+'" data-sym="'+s+'">'+s+'</button>'; });
-      h+='<button type="button" class="sym-btn none'+(m.sym===''?' sel':'')+'" data-sym="">ללא</button>';
-      h+='</div><div class="lab">צבע:</div><div class="swatches">';
-      COLORS.forEach(function(c){ h+='<button type="button" class="sw-btn'+(m.color===c?' sel':'')+'" data-color="'+c+'" style="background:'+c+'"></button>'; });
-      h+='</div>';
-      row.innerHTML=h;
-      row.querySelectorAll('.sym-btn').forEach(function(b){ b.onclick=function(){ m.sym=b.getAttribute('data-sym'); buildMarks(); }; });
-      row.querySelectorAll('.sw-btn').forEach(function(b){ b.onclick=function(){ m.color=b.getAttribute('data-color'); buildMarks(); }; });
-      list.appendChild(row);
-    });
+  function phaseNextDates(k){
+    if(!state.lastPeriod) return null;
+    var lp=new Date(state.lastPeriod+'T00:00:00');
+    var cl=state.cycleLength, pl=state.periodLength, off=ovulOffsetDays(lp,cl);
+    var today=new Date(); today.setHours(0,0,0,0);
+    for(var i=0;i<14;i++){
+      var base=addDays(lp,i*cl);
+      var r=phaseDayRange(k,off,cl,pl);
+      var s=addDays(base,r[0]), e=addDays(base,r[1]-1);
+      if(e>=today) return {s:s,e:e};
+    }
+    return null;
   }
+  function fmtShort(d){ return d.getDate()+'.'+(d.getMonth()+1); }
 
   function buildHormones(){
     var list=document.getElementById('hormoneList'); if(!list) return; list.innerHTML="";
@@ -587,21 +567,42 @@
       h+='<p class="hphase-tip"><b>תמיכה בגוף:</b> '+p.tip+'</p>';
       h+='<p class="hphase-tip"><b>ויטמינים תומכים:</b> '+p.vit+'</p>';
       h+='<div class="hphase-tog"><span>להציג שלב זה ביומן?</span><button type="button" class="htog'+(hp.show?' on':'')+'" data-t="show"><span class="knob"></span></button></div>';
-      h+='<div class="hphase-tog"><span>לציין את ההמלצות בהתראה?</span><button type="button" class="htog'+(hp.tips?' on':'')+'" data-t="tips"><span class="knob"></span></button></div>';
-      h+='<div class="hphase-tog"><span>לציין ויטמינים בהתראה?</span><button type="button" class="htog'+(hp.vits?' on':'')+'" data-t="vits"><span class="knob"></span></button></div>';
-      h+='<div class="hphase-pick'+(hp.show?'':' hidden')+'"><div class="lab">סמל:</div><div class="symbols">';
-      p.syms.forEach(function(s){ h+='<button type="button" class="sym-btn'+(m.sym===s?' sel':'')+'" data-sym="'+s+'">'+s+'</button>'; });
-      h+='<button type="button" class="sym-btn none'+(m.sym===''?' sel':'')+'" data-sym="">ללא</button>';
-      h+='</div><div class="lab">צבע:</div><div class="swatches">';
-      COLORS.forEach(function(c){ h+='<button type="button" class="sw-btn'+(m.color===c?' sel':'')+'" data-color="'+c+'" style="background:'+c+'"></button>'; });
-      h+='</div></div>';
+      if(hp.show){
+        var dts=phaseNextDates(p.k);
+        if(dts){
+          var dtxt = (fmtShort(dts.s)===fmtShort(dts.e)) ? fmtShort(dts.s) : (fmtShort(dts.s)+' – '+fmtShort(dts.e));
+          h+='<p class="hphase-dates">📅 יסומן ביומן בתאריכים: '+dtxt+' (וחוזר בכל מחזור)</p>';
+        }
+        // בורר סימון: צבע בלבד או סמל בלבד
+        if(p.mark==='symbol'){
+          h+='<div class="hphase-pick"><div class="lab">סמל:</div><div class="symbols">';
+          p.syms.forEach(function(s){ h+='<button type="button" class="sym-btn'+(m.sym===s?' sel':'')+'" data-sym="'+s+'">'+s+'</button>'; });
+          h+='</div></div>';
+        } else {
+          h+='<div class="hphase-pick"><div class="lab">צבע:</div><div class="swatches">';
+          COLORS.forEach(function(c){ h+='<button type="button" class="sw-btn'+(m.color===c?' sel':'')+'" data-color="'+c+'" style="background:'+c+'"></button>'; });
+          h+='</div></div>';
+        }
+        h+='<div class="hphase-tog"><span>לציין את ההמלצות בהתראה?</span><button type="button" class="htog'+(hp.tips?' on':'')+'" data-t="tips"><span class="knob"></span></button></div>';
+        h+='<div class="hphase-tog"><span>לציין ויטמינים בהתראה?</span><button type="button" class="htog'+(hp.vits?' on':'')+'" data-t="vits"><span class="knob"></span></button></div>';
+        if(p.alert){
+          h+='<div class="hphase-tog"><span>התראה כמה ימים לפני?</span><button type="button" class="htog'+(hp.alert?' on':'')+'" data-t="alert"><span class="knob"></span></button></div>';
+          if(hp.alert){
+            h+='<div class="hphase-days">';
+            [1,2,3,4,5].forEach(function(d){ h+='<button type="button" class="day-btn'+(hp.alertDays===d?' sel':'')+'" data-days="'+d+'">'+d+' '+(d===1?'יום':'ימים')+'</button>'; });
+            h+='</div>';
+          }
+        }
+      }
       card.innerHTML=h;
       card.querySelectorAll('.htog').forEach(function(b){ b.onclick=function(){ var t=b.getAttribute('data-t'); hp[t]=!hp[t]; buildHormones(); }; });
       card.querySelectorAll('.sym-btn').forEach(function(b){ b.onclick=function(){ m.sym=b.getAttribute('data-sym'); buildHormones(); }; });
       card.querySelectorAll('.sw-btn').forEach(function(b){ b.onclick=function(){ m.color=b.getAttribute('data-color'); buildHormones(); }; });
+      card.querySelectorAll('.day-btn').forEach(function(b){ b.onclick=function(){ hp.alertDays=+b.getAttribute('data-days'); buildHormones(); }; });
       list.appendChild(card);
     });
   }
+  function onAlertHour(){ var h=document.getElementById('alertHour'); state.alertHour=h?(h.value||"09:00"):"09:00"; }
 
   function buildMoons(){
     var list=document.getElementById('moonList'); if(!list) return; list.innerHTML="";
@@ -655,15 +656,16 @@
     document.getElementById('dateHint').classList.toggle('hidden', !(showCycle && !state.lastPeriod));
     var showAlerts = showCycle && !!state.lastPeriod;
     var noPeriodActive = state.menses==="no" && !!state.phase;
-    document.getElementById('alertsBox').classList.toggle('hidden', !showAlerts);
-    document.getElementById('marksBox').classList.toggle('hidden', !showAlerts);
     document.getElementById('hormoneBox').classList.toggle('hidden', !showAlerts);
     // הירח מתאים גם למי שאין לה וסת
     document.getElementById('moonBox').classList.toggle('hidden', !(showAlerts || noPeriodActive));
     document.getElementById('trackBox').classList.toggle('hidden', !showAlerts);
     document.getElementById('saveWrap').classList.toggle('hidden', !(showAlerts || noPeriodActive));
-    if(showAlerts){ computePredictions(); renderTrack(); }
+    if(showAlerts){ computePredictions(); renderTrack(); buildHormones(); }
   }
+
+  function onCl(){ state.cycleLength=+document.getElementById('cycleLen').value; document.getElementById('clVal').textContent=state.cycleLength; render(); }
+  function onPl(){ state.periodLength=+document.getElementById('periodLen').value; document.getElementById('plVal').textContent=state.periodLength; render(); }
 
   function fmt(d){ return d.toLocaleDateString('he-IL',{day:'numeric',month:'long'}); }
   function fmtFull(d){ return d.toLocaleDateString('he-IL',{day:'numeric',month:'long',year:'numeric'}); }
@@ -674,8 +676,6 @@
     c.textContent = state.lastPeriod ? ("נבחר: "+fmtFull(new Date(state.lastPeriod+'T00:00:00'))) : "";
     render();
   }
-  function onCl(){ state.cycleLength=+document.getElementById('cycleLen').value; document.getElementById('clVal').textContent=state.cycleLength; render(); }
-  function onPl(){ state.periodLength=+document.getElementById('periodLen').value; document.getElementById('plVal').textContent=state.periodLength; }
 
   function ovulOffsetDays(lp,cl){
     var off=Math.round(cl/2-1);
@@ -694,16 +694,11 @@
     var ovul=new Date(lp.getTime()+off*DAY);
     var fStart=new Date(ovul.getTime()-5*DAY);
     var fEnd=new Date(ovul.getTime()+1*DAY);
-    document.getElementById('predPeriod').textContent=fmt(nextPeriod);
-    document.getElementById('predFert').textContent=fmt(fStart)+" \u2013 "+fmt(fEnd);
-    document.getElementById('predOvul').textContent=fmt(ovul);
+    var a=document.getElementById('predPeriod'); if(a) a.textContent=fmt(nextPeriod);
+    var b=document.getElementById('predFert'); if(b) b.textContent=fmt(fStart)+" \u2013 "+fmt(fEnd);
+    var c=document.getElementById('predOvul'); if(c) c.textContent=fmt(ovul);
   }
 
-  function toggle(id){ document.getElementById(id).classList.toggle('on'); }
-  function updateTogSub(){
-    var h=document.getElementById('alertHour'); if(h) state.hour=h.value||"09:00";
-    document.getElementById('togPeriodSub').textContent=state.daysBefore+" "+(state.daysBefore===1?"יום":"ימים")+" מראש, בשעה "+state.hour;
-  }
   function setKnownOvul(v){
     state.knownOvulKnown=v;
     document.getElementById('ovulYes').classList.toggle('sel',v);
@@ -758,11 +753,14 @@
       { method:'POST', body:JSON.stringify({ summary:GCAL_NAME, timeZone:'Asia/Jerusalem' }) })
       .then(function(c){ try{ localStorage.setItem('sagego_gcal_calId',c.id); }catch(e){} return c.id; });
   }
+  function getUrlCalId(){ try{ var m=(location.search||'').match(/[?&]cal=([^&]+)/); return m?decodeURIComponent(m[1]):null; }catch(e){ return null; } }
   function findOrCreateCalendar(){
+    var fromUrl=getUrlCalId();
     var stored=null; try{ stored=localStorage.getItem('sagego_gcal_calId'); }catch(e){}
-    if(stored){
-      return gapiFetch('https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(stored))
-        .then(function(c){ return c.id; })
+    var cand=fromUrl||stored;
+    if(cand){
+      return gapiFetch('https://www.googleapis.com/calendar/v3/calendars/'+encodeURIComponent(cand))
+        .then(function(c){ try{ localStorage.setItem('sagego_gcal_calId',c.id); }catch(e){} return c.id; })
         .catch(function(){ clearStoredCal(); return createCal(); });
     }
     return createCal();
@@ -804,29 +802,22 @@
       var lp=new Date(state.lastPeriod+'T00:00:00');
       var cl=state.cycleLength, pl=state.periodLength;
       var off=ovulOffsetDays(lp,cl);
-      var hp=(state.hour||'09:00').split(':');
-      var hourMin=(+hp[0])*60+(+hp[1]||0);
-      var remMin=(state.daysBefore||2)*1440-hourMin; if(remMin<0) remMin=10;
-      var m=state.marks;
+      var hpArr=(state.alertHour||'09:00').split(':');
+      var hourMin=(+hpArr[0])*60+(+hpArr[1]||0);
       var cycles=Math.ceil(MONTHS_AHEAD*30/cl)+1;
       for(var i=0;i<cycles;i++){
-        var ps=addDays(lp,i*cl);
-        var pe=addDays(ps,pl);
-        var ov=addDays(ps,off);
-        var fs=addDays(ov,-5), fe=addDays(ov,2);
-        evts.push(mkEv(m.period,'וסת',ps,pe, state.remindBefore?remMin:null));
-        evts.push(mkEv(m.fertile,'חלון פוריות',fs,fe, state.remindFertile?remMin:null));
-        evts.push(mkEv(m.ovul,'יום הביוץ',ov,addDays(ov,1), null));
+        var base=addDays(lp,i*cl);
         PHASES.forEach(function(p){
           var hph=state.hphase[p.k]; if(!hph.show) return;
-          var s,e;
-          if(p.k==='follicular'){ s=addDays(ps,pl); e=ov; }
-          else if(p.k==='ovul'){ s=ov; e=addDays(ov,1); }
-          else if(p.k==='luteal'){ s=addDays(ov,1); e=addDays(ps,cl); }
-          else { s=ps; e=pe; }
+          var r=phaseDayRange(p.k,off,cl,pl);
+          var s=addDays(base,r[0]), e=addDays(base,r[1]);
           if(e<=s) e=addDays(s,1);
-          var label=p.name.replace(/ \(.*\)/,'')+' · '+p.hormone+(hph.tips?(' · '+p.tipShort):'')+(hph.vits?(' · '+p.vitShort):'');
-          evts.push(mkEv(state.hmarks[p.k], label, s, e, null));
+          // צבע בלבד או סמל בלבד
+          var mark = (p.mark==='symbol') ? {sym:state.hmarks[p.k].sym, color:''} : {sym:'', color:state.hmarks[p.k].color};
+          var label=p.name.replace(/ \(.*\)/,'')+(hph.tips?(' · '+p.tipShort):'')+(hph.vits?(' · '+p.vitShort):'');
+          var rem=null;
+          if(p.alert && hph.alert){ rem=(hph.alertDays||2)*1440-hourMin; if(rem<0) rem=10; }
+          evts.push(mkEv(mark, label, s, e, rem));
         });
       }
     }
@@ -836,17 +827,18 @@
   }
   function addAnchorEvents(evts){
     var today=new Date(); today.setHours(0,0,0,0);
-    var url='https://liatbarni-dev.github.io/sagegocycle/';
+    var base='https://liatbarni-dev.github.io/sagegocycle/';
+    var url=base+(gcalCalendarId?('?cal='+encodeURIComponent(gcalCalendarId)):'');
     var endDate=addDays(today,365);
     evts.push({
       summary:'\u2699\uFE0F SagegoCycle — דף השאלון לעדכון',
-      description:'לעדכון הפרטים שלך (וסת, ביוץ, שלבים, ירח) — היכנסי לקישור:\n'+url+'\n\nתוקף השירות עד '+fmtD(endDate)+'. בסיומו יידרש חידוש.',
+      description:'⚠️ חשוב: לעדכון הפרטים שלך — היכנסי דרך הקישור הזה בלבד (כך חוזרים בדיוק לאותו יומן, בלי ליצור יומן חדש):\n'+url+'\n\nאפשר לעדכן בכל רגע (וסת, ביוץ, שלבים, ירח). תוקף השירות עד '+fmtD(endDate)+'.',
       start:{date:fmtD(today)}, end:{date:fmtD(addDays(today,1))},
       transparency:'transparent', colorId:'8', reminders:{useDefault:false,overrides:[]}
     });
     evts.push({
       summary:'\uD83D\uDD14 SagegoCycle — תוקף השירות הסתיים, נדרש חידוש',
-      description:'תוקף השירות הסתיים. כדי להמשיך לקבל תחזיות ביומן — היכנסי לדף ובצעי חידוש:\n'+url,
+      description:'תוקף השירות הסתיים. כדי להמשיך לקבל תחזיות ביומן — היכנסי דרך הקישור הזה בלבד ובצעי חידוש:\n'+url,
       start:{date:fmtD(endDate)}, end:{date:fmtD(addDays(endDate,1))},
       transparency:'transparent', colorId:'11', reminders:{useDefault:false,overrides:[{method:'popup',minutes:9*60}]}
     });
@@ -929,14 +921,14 @@
   function closeConfirm(){ document.getElementById('confirmModal').style.display='none'; }
 
   document.addEventListener('DOMContentLoaded', function(){
-    buildReasons(); buildPhases(); buildDays(); buildMarks(); buildHormones(); buildMoons(); updateTogSub();
+    buildReasons(); buildPhases(); buildHormones(); buildMoons();
     (function(){
       var t=new Date(); t.setHours(0,0,0,0);
       var end=new Date(t.getTime()+365*DAY);
       var at=document.getElementById('anchorToday'); if(at) at.textContent=fmtFull(t);
       var ae=document.getElementById('anchorEnd'); if(ae) ae.textContent=fmtFull(end);
     })();
-    document.getElementById('alertHour').addEventListener('change', function(){ state.hour=this.value||"09:00"; updateTogSub(); });
+    document.getElementById('gcalConnect').addEventListener('click', gcalConnect);
     document.getElementById('gcalConnect').addEventListener('click', gcalConnect);
     document.getElementById('confirmYes').addEventListener('click', function(){ closeConfirm(); doSync(); });
     document.getElementById('confirmNo').addEventListener('click', closeConfirm);
